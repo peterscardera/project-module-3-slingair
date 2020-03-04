@@ -73,6 +73,7 @@ p, a, li, blockquote, input {
     height: 60px;
     width: 550px;
 }
+
 .flight-select {
     background: var(--cadmium-red);
     height: 80px;
@@ -84,6 +85,12 @@ p, a, li, blockquote, input {
 .flight-select input {
     width: 125px;
     margin-left: var(--page-padding);
+}
+
+.order-select {
+    font-size: 25px ;
+    font-family:  var(--heading-font);
+    margin-left: 10px;
 }
 
 input {

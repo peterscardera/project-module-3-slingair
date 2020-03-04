@@ -1,10 +1,11 @@
-const flightInput = document.getElementById('flight');
+const dropDownSelected = document.getElementById('flight');
 const seatsDiv = document.getElementById('seats-section');
-const confirmButton = document.getElementById('confirm-button');
+const confirmButton = document.getElementById("confirm-button")
 
 let selection = '';
 
-const renderSeats = () => {
+
+const renderSeats = (arrayOfObj) => {
     document.querySelector('.form-container').style.display = 'block';
 
     const alpha = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -16,9 +17,18 @@ const renderSeats = () => {
         for (let s = 1; s < 7; s++) {
             const seatNumber = `${r}${alpha[s-1]}`;
             const seat = document.createElement('li')
-            const seatOccupied = `<li><label class="seat"><span id="${seatNumber}" class="occupied">${seatNumber}</span></label></li>`
-            const seatAvailable = `<li><label class="seat"><input type="radio" name="seat" value="${seatNumber}" /><span id="${seatNumber}" class="avail">${seatNumber}</span></label></li>`        
-            seat.innerHTML = seatAvailable;
+
+            const seatOccupied = `<li><label class="seat"><span id="${seatNumber}" class="occupied">${seatNumber}</span></label></li>`;
+            const seatAvailable = `<li><label class="seat"><input type="radio" name="seat" value="${seatNumber}" /><span id="${seatNumber}" class="avail">${seatNumber}</span></label></li>`;
+            const realSeat = arrayOfObj.find(seat => seat.id === seatNumber);
+            console.log(realSeat)
+            // seat.innerHTML = realSeat.isAvailable ? seatAvailable : seatOccupied;
+            //if true, then get Seat Available else seat occupied.
+            if (realSeat.isAvailable) {
+                seat.innerHTML = seatAvailable
+            } else {
+                seat.innerHTML = seatOccupied
+            }
             row.appendChild(seat);
         }
     }
@@ -39,22 +49,102 @@ const renderSeats = () => {
     });
 }
 
+//---------------------------FETCH THE LIST OF FLIGHTS----------------------------- 
 
+fetch("/flightList", {
+    method: "GET",
+    headers: {
+        "accept": "application/json", // 
+        "content-type": "application/json" //what this function is send to u
+    }
+}).then(item => {
+    return item.json()
+}).then(list => {
+    //console.log(list.flights) //list of flight numbers sent back from server
+
+    let section = document.getElementById("flight"); //the section in html
+    section.addEventListener("change", nextFunction) //to pass on the event
+
+
+    list.forEach(item => {
+       let option =  document.createElement("option");
+        option.id = `${item}` //each flight number
+        option.innerHTML = `${item}`
+        section.appendChild(option)
+        
+    })
+
+})
+//-------------------------
+function nextFunction(event) {
+    toggleFormContent(event)
+}
+
+//-----------------------------FETCH FOR ON SELECTION --------------------------
 const toggleFormContent = (event) => {
-    const flightNumber = flightInput.value;
-    console.log('toggleFormContent: ', flightNumber);
+
+    const flightInput = event.target.value
     
-    // TODO: contact the server to get the seating availability
-    //      - only contact the server if the flight number is this format 'SA###'.
-    //      - Do I need to create an error message if the number is not valid?
+        fetch(`/seat-select/${flightInput}`, { //passing this from above
+            method: "GET",
+            headers: {
+                "accept": "application/json", // 
+                "content-type": "application/json" //what this function is send to u
+            }
+        }).then(serverRes => {
+         return serverRes.json() // no on one line so its not an implied return
+            
+        })
+        .then( arrayOfObj => {
+            renderSeats(arrayOfObj)
+         })
     
-    // TODO: Pass the response data to renderSeats to create the appropriate seat-type.
-    renderSeats();
+}
+// ---------------------------------------------------ON CONFIRM ------------------------------------------------------------------------
+const handleConfirmSeat = (event) => {
+   event.preventDefault();
+
+//let flightNo = document.getElementById("flight");
+let givenName = document.getElementById("givenName");
+let surname = document.getElementById("surname");
+let email = document.getElementById("email");
+let seatChosen = document.getElementById("seat-number");
+let time = new Date();
+
+
+
+const data = {
+
+    givenName: givenName.value,
+    surname: surname.value,
+    email: email.value,
+    seatChosen: seatChosen.innerHTML,
+   
+    flightNo : dropDownSelected.value,
+    time: time.getTime()
+
 }
 
-const handleConfirmSeat = () => {
-    // TODO: everything in here!
+
+
+
+   fetch("/sendData", { //passing this from above
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+        "accept": "application/json", // 
+        "content-type": "application/json" //what this function is send to u
+    }
+}).then(data => {
+   return (data.json())
+}).then (response => {
+   //not doing anything with the response yet *****
+    window.location.href = "/seat-select/confirmed.html"
+  
+})
+
+
 
 }
+// ------------------------------------------------------------------------------------------------
 
-flightInput.addEventListener('blur', toggleFormContent);
