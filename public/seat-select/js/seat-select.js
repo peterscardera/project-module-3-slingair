@@ -21,7 +21,7 @@ const renderSeats = (arrayOfObj) => {
             const seatOccupied = `<li><label class="seat"><span id="${seatNumber}" class="occupied">${seatNumber}</span></label></li>`;
             const seatAvailable = `<li><label class="seat"><input type="radio" name="seat" value="${seatNumber}" /><span id="${seatNumber}" class="avail">${seatNumber}</span></label></li>`;
             const realSeat = arrayOfObj.find(seat => seat.id === seatNumber);
-            console.log(realSeat)
+            //console.log(realSeat)
             // seat.innerHTML = realSeat.isAvailable ? seatAvailable : seatOccupied;
             //if true, then get Seat Available else seat occupied.
             if (realSeat.isAvailable) {
@@ -108,8 +108,11 @@ const handleConfirmSeat = (event) => {
 let givenName = document.getElementById("givenName");
 let surname = document.getElementById("surname");
 let email = document.getElementById("email");
-let seatChosen = document.getElementById("seat-number");
-let time = new Date();
+let seatChosen = document.getElementById("seat-number").innerHTML;
+//Below im removing the "( )" between the seat number
+let slicedSeat = seatChosen.slice(1,3)
+console.log(slicedSeat)
+//let time = new Date();
 
 
 
@@ -118,10 +121,9 @@ const data = {
     givenName: givenName.value,
     surname: surname.value,
     email: email.value,
-    seatChosen: seatChosen.innerHTML,
-   
-    flightNo : dropDownSelected.value,
-    time: time.getTime()
+    seat: slicedSeat,
+    flight : dropDownSelected.value,
+    //time: time.getTime()
 
 }
 
@@ -139,7 +141,7 @@ const data = {
    return (data.json())
 }).then (response => {
    //not doing anything with the response yet *****
-    window.location.href = "/seat-select/confirmed.html"
+   window.location.href = "/seat-select/confirmed.html"
   
 })
 

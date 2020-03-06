@@ -19,8 +19,8 @@ fetch("/getFlightInfo", {
 }).then(item => {
     //console.log(item, "*****") //returns the  item = { }
    name.innerHTML = item.givenName
-   flightNum.innerHTML = item.flightNo
-   seat.innerHTML = item.seatChosen
+   flightNum.innerHTML = item.flight
+   seat.innerHTML = item.seat
    email.innerHTML = item.email
 })
 
